@@ -33,7 +33,7 @@ export class ImageGallery extends Component  {
       <div className="image-gallery">
         {loading && <div>Завантажуємо...</div>}
         <ul>
-          <li class="gallery-item">
+          <li className="gallery-item">
             {/* <img src={img.hits.areau.webformatURL} alt="" width="250" /> */}
           </li>
         </ul>
