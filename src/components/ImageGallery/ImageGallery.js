@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-
 export class ImageGallery extends Component  {
 
   state = {
