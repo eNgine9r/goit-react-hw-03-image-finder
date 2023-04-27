@@ -3,34 +3,31 @@ import React, { Component } from 'react';
 export class Searchbar extends Component {
 
   state = {
-    images: '',
-    currentPage: 1,
-    loading: true,
-    modalIsOpen: false
+    query: '',
   };
 
   handleInputChange = e => {
-    this.setState({ images: e.currentTarget.value.toLowerCase() });
+    this.setState({ query: e.currentTarget.value.toLowerCase() });
   };
 
   handleSubmit = e => {
     e.preventDefault();
 
-    if (this.state.images.trim() === '') {
+    if (this.state.query.trim() === '') {
       alert('Введіть ключове слово, для пошуку зображення')
       return;
     }
 
-    this.props.onSubmit(this.state.images);
-    this.setState({ images: [] });
+    this.props.onSubmit(this.state.query);
+    this.setState({ query: '' });
   };
 
   render () {
     return (
       <header className="searchbar">
-        <form className="form">
+        <form onSubmit={this.handleSubmit} className="form">
           <button type="submit" className="button">
-            <span className="buttoLabel" onClick={this.handleSubmit}>Search</span>
+            Search
           </button>
 
           <input
@@ -39,7 +36,7 @@ export class Searchbar extends Component {
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            value={this.state.images}
+            value={this.state.query}
             onChange={this.handleInputChange}
           />
         </form>
