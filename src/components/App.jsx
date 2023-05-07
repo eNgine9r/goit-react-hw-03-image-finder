@@ -1,71 +1,84 @@
 import React, { Component } from 'react';
-// import { ToastContainer } from 'react-toastify';
-
-import Searchbar from './Searchbar/Searchbar';
-// import ImageGallery from './ImageGallery/ImageGallery';
-import ImageApi from '../services/Pixaby-api';
-// import ImageGallery from 'components/ImageGallery';
+import api from '../services/Pixaby-api';
+import SearchBar from './SearchBar/SearchBar';
+import ImageGallery from './ImageGallery/ImageGallery';
+import Loader from './Loader/Loader';
+import Modal from './Modal/Modal';
+import Button from './Button/Button';
 
 export class App extends Component {
-
   state = {
-    query: '',
     images: [],
-    img: null,
-    loading: false,
-    currentPage: 1,
-  }
-
-  handleFormSubmit = query => {
-    this.setState({query});
-  }
-
+    searchImages: '',
+    page: 1,
+    isLoading: false,
+    showModal: false,
+    modalImage: '',
+    error: null,
+    showLoadMoreBTN: false,
+  };
   componentDidUpdate(prevProps, prevState) {
-  const { query, currentPage } = this.state;
-
-  if (prevState.query !== query) {
-    this.setState({ loading: true, img: null });
-    
-    fetch(`https://pixabay.com/api/?q=${query}&page=${currentPage}&key=34447371-d1c04ab6613d972420d21a436&image_type=photo&orientation=horizontal&per_page=12`)
-    .then(res => res.json())
-    .then(img => this.setState({ img }))
-    .finally(() => this.setState({ loading: false }));
+    if (prevState.searchImages !== this.state.searchImages) {
+      this.getImages();
+    }
   }
-}
 
-  handleLoadMore = () => {
-    this.setState((prevState) => ({ currentPage: prevState.currentPage + 1 }));
+  onChangeImages = query => {
+    this.setState({ searchImages: query, page: 1, images: [], error: null });
+  };
+
+  getImages = () => {
+    const { searchImages, page } = this.state;
+    this.setState({ isLoading: true });
+
+    api
+      .fetchImages({ searchImages, page })
+      .then(hits => {
+        this.setState(prevState => ({
+          images: [...prevState.images, ...hits],
+          page: prevState.page + 1,
+          showLoadMoreBTN: true,
+        }));
+        if (hits.length < 12 && hits.length > 0) {
+          alert('You have seen all the pictures');
+          this.setState({ showLoadMoreBTN: false });
+          return;
+        }
+        if (hits.length === 0) {
+          alert('Sorry, we did not find any images');
+          this.setState({ showLoadMoreBTN: false });
+          return;
+        }
+      })
+      .catch(error => this.setState({ error }))
+      .finally(() => this.setState({ isLoading: false }));
+  };
+
+  onLoadMore = images => {
+    this.getImages();
+  };
+
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  };
+
+  openModal = largeURL => {
+    this.setState({ modalImg: largeURL });
+    this.toggleModal();
   };
 
   render() {
-    const { img, loading } = this.state;
-
+    const { images, isLoading, error, showModal, modalImg, showLoadMoreBTN } =
+      this.state;
     return (
-    <div>
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        <div className="image-gallery">
-        {img && (
-        <div>
-          <div>{img.tags}</div>
-          <ul>
-            {img.hits.map((hit) => (
-              <li key={hit.id} className="gallery-item">
-                <img src={hit.webformatURL} alt="" width="250" />
-              </li>
-            ))}
-          </ul>
-            {!loading && img.length > 0 && (
-            <button className="load-more-button" onClick={this.handleLoadMore}>
-              Показати ще
-            </button>
-        )}
-        </div>
-      )}
-        {!img && <div>Потрібно ввести назву для пошуку.</div>}
-        {img && <div>{img.tags}</div>}
+      <div>
+        {showModal && <Modal modalURL={modalImg} onClose={this.toggleModal} />}
+        {error && <p>Oops!</p>}
+        <SearchBar onSubmit={this.onChangeImages} />
+        <ImageGallery images={images} openModal={this.openModal}></ImageGallery>
+        {isLoading && <Loader />}
+        {showLoadMoreBTN && <Button onClick={this.onLoadMore} />}
       </div>
-    </div>
-  );
+    );
   }
-
-};
+}
