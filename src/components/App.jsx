@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import api from '../services/Pixaby-api';
-import SearchBar from './SearchBar/SearchBar';
+import SearchBar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';

@@ -1,9 +1,9 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import css from './SearchBar.module.css';
+import css from './Searchbar.module.css';
 
-export default class SearchBar extends Component {
+export default class Searchbar extends Component {
   state = {
     image: '',
   };
@@ -42,6 +42,6 @@ export default class SearchBar extends Component {
   }
 }
 
-SearchBar.propTypes = {
+Searchbar.propTypes = {
   onSubmit: PropTypes.func,
 };
