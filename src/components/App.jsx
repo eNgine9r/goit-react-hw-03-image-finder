@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { ToastContainer } from 'react-toastify';
+// import { ToastContainer } from 'react-toastify';
 
 import Searchbar from './Searchbar/Searchbar';
+// import ImageGallery from './ImageGallery/ImageGallery';
 import ImageApi from '../services/Pixaby-api';
 // import ImageGallery from 'components/ImageGallery';
 
@@ -20,18 +21,17 @@ export class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { query, currentPage } = this.state;
+  const { query, currentPage } = this.state;
 
   if (prevState.query !== query) {
     this.setState({ loading: true, img: null });
     
-    ImageApi.fetchImage(query)
     fetch(`https://pixabay.com/api/?q=${query}&page=${currentPage}&key=34447371-d1c04ab6613d972420d21a436&image_type=photo&orientation=horizontal&per_page=12`)
     .then(res => res.json())
     .then(img => this.setState({ img }))
     .finally(() => this.setState({ loading: false }));
-    }
   }
+}
 
   handleLoadMore = () => {
     this.setState((prevState) => ({ currentPage: prevState.currentPage + 1 }));
