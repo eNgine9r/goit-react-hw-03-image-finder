@@ -1,4 +1,6 @@
 .Searchbar {
+  position: sticky;
+  top: 0;
   display: flex;
   color: #fff;
   background-image: repeating-linear-gradient(-45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px);
@@ -6,6 +8,7 @@
   box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .2), 0 1px 1px rgba(0, 0, 0, .14), 0 1px 3px rgba(0, 0, 0, .12);
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .SearchForm {

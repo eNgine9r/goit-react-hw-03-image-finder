@@ -27,34 +27,28 @@ export class App extends Component {
     this.setState({ searchImages: query, page: 1, images: [], error: null });
   };
 
-  getImages = () => {
-    const { searchImages, page } = this.state;
-    this.setState({ isLoading: true });
+async getImages() {
+  const { searchImages, page } = this.state;
+  this.setState({ isLoading: true });
+  try {
+    const hits = await api.fetchImages({ searchImages, page });
+    this.setState(prevState => ({
+      images: [...prevState.images, ...hits],
+      page: prevState.page + 1,
+      showLoadMoreBTN: true,
+    }));
+    if (hits.length === 0) {
+      alert('Sorry, we did not find any images');
+      this.setState({ showLoadMoreBTN: false });
+    }
+  } catch (error) {
+    this.setState({ error });
+  } finally {
+    this.setState({ isLoading: false });
+  }
+};
 
-    api
-      .fetchImages({ searchImages, page })
-      .then(hits => {
-        this.setState(prevState => ({
-          images: [...prevState.images, ...hits],
-          page: prevState.page + 1,
-          showLoadMoreBTN: true,
-        }));
-        if (hits.length < 12 && hits.length > 0) {
-          alert('You have seen all the pictures');
-          this.setState({ showLoadMoreBTN: false });
-          return;
-        }
-        if (hits.length === 0) {
-          alert('Sorry, we did not find any images');
-          this.setState({ showLoadMoreBTN: false });
-          return;
-        }
-      })
-      .catch(error => this.setState({ error }))
-      .finally(() => this.setState({ isLoading: false }));
-  };
-
-  onLoadMore = images => {
+  onLoadMore = () => {
     this.getImages();
   };
 
@@ -74,7 +68,7 @@ export class App extends Component {
       <div>
         {showModal && <Modal modalURL={modalImg} onClose={this.toggleModal} />}
         {error && <p>Oops!</p>}
-        <SearchBar onSubmit={this.onChangeImages} />
+        <SearchBar onSubmit={this.onChangeImages} disabled={isLoading} />
         <ImageGallery images={images} openModal={this.openModal}></ImageGallery>
         {isLoading && <Loader />}
         {showLoadMoreBTN && <Button onClick={this.onLoadMore} />}
