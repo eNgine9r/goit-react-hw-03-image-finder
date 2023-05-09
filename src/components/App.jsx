@@ -18,8 +18,9 @@ export class App extends Component {
     showLoadMoreBTN: false,
   };
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.searchImages !== this.state.searchImages) {
-      this.getImages();
+    const { searchImages, page } = this.state;
+    if (prevState.searchImages !== searchImages || prevState.page !== page) {
+      this.getImages(searchImages, page);
     }
   }
 
@@ -34,8 +35,8 @@ async getImages() {
     const hits = await api.fetchImages({ searchImages, page });
     this.setState(prevState => ({
       images: [...prevState.images, ...hits],
-      page: prevState.page + 1,
-      showLoadMoreBTN: true,
+      total: hits.totalHits,
+      showLoadMoreBTN: hits.length >= 12,
     }));
     if (hits.length === 0) {
       alert('Sorry, we did not find any images');
@@ -49,7 +50,7 @@ async getImages() {
 };
 
   onLoadMore = () => {
-    this.getImages();
+    this.setState(prev => ({ page: prev.page + 1 }));
   };
 
   toggleModal = () => {
@@ -61,15 +62,21 @@ async getImages() {
     this.toggleModal();
   };
 
-  render() {
-    const { images, isLoading, error, showModal, modalImg, showLoadMoreBTN } =
+  onCloseModal = () => {
+    this.setState({ showModal: false, largeURL: ''});
+  };
+
+    render() {
+    const { images, isLoading, error, showModal, modalImg, showLoadMoreBTN} =
       this.state;
     return (
       <div>
         {showModal && <Modal modalURL={modalImg} onClose={this.toggleModal} />}
         {error && <p>Oops!</p>}
         <SearchBar onSubmit={this.onChangeImages} disabled={isLoading} />
-        <ImageGallery images={images} openModal={this.openModal}></ImageGallery>
+        {images.length !== 0 && (
+          <ImageGallery images={images} openModal={this.openModal}></ImageGallery>
+        )}
         {isLoading && <Loader />}
         {showLoadMoreBTN && <Button onClick={this.onLoadMore} />}
       </div>

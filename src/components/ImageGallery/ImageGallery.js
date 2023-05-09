@@ -12,7 +12,6 @@ const ImageGallery = ({ images, toggleModal, openModal }) => {
           largeImageURL={largeImageURL}
           tags={tags}
           openModal={openModal}
-          toggleModal={toggleModal}
         />
       ))}
     </ul>
@@ -22,7 +21,13 @@ const ImageGallery = ({ images, toggleModal, openModal }) => {
 export default ImageGallery;
 
 ImageGallery.propTypes = {
-  images: PropTypes.arrayOf(PropTypes.shape(PropTypes.string.isRequired)),
-  toggleOnLoading: PropTypes.func,
-  openModal: PropTypes.func,
+  images: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      webformatURL: PropTypes.string.isRequired,
+      tags: PropTypes.string.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
+    }).isRequired
+  ).isRequired,
+  openModal: PropTypes.func.isRequired,
 };
